@@ -1,6 +1,7 @@
 import hashlib
 import requests
 import json
+import time
 
 import sys
 
@@ -51,17 +52,19 @@ if __name__ == '__main__':
     while running:
         # Get the last block from the server and look for a new one
         r = requests.get(node + '/latest_block')
-        print(r.status_code)
-        # print(r.json)
-        print(r.text)
+        # print(r.status_code)
+        # # print(r.json)
+        # print(r.text)
         block = json.loads(r.text)
         found = False
+        start_time = time.time()
         while not found:
             proof = proof_of_work(block)
             found = valid_proof(json.dumps(
                 block, sort_keys=True).encode(), proof)
+        find_time = time.time() - start_time
         running = False
-        print(proof)
+        print(f"proof: {proof} found in {find_time}s")
         # TODO: When found, POST it to the server {"proof": new_proof}
         # TODO: We're going to have to research how to do a POST in Python
         # HINT: Research `requests` and remember we're sending our data as JSON

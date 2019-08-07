@@ -19,8 +19,8 @@ _Client Mining_
 Create a client application that will:
 
 - - Request the latest proof from the `last_proof` endpoint on the server
-- Run the `proof_of_work` function until a valid proof is found, validating or rejecting each attempt
-- Print messages indicating that this has started and finished. (Stretch: Add a timer)
+- - Run the `proof_of_work` function until a valid proof is found, validating or rejecting each attempt
+- - Print messages indicating that this has started and finished. (Stretch: Add a timer)
 - Modify it to generate proofs with _6_ leading zeroes.
 - When a valid proof is found, send it to the `mine` endpoint.
 - Print a message indicating the success or failure response from the server
