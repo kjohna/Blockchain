@@ -67,17 +67,19 @@ if __name__ == '__main__':
             found = valid_proof(json.dumps(
                 block, sort_keys=True).encode(), proof)
         find_time = time.time() - start_time
-        running = False
         print(f"proof: {proof} found in {find_time}s")
         # When found, POST it to the server {"proof": new_proof}
-        # TODO: We're going to have to research how to do a POST in Python
-        # HINT: Research `requests` and remember we're sending our data as JSON
-        data = json.dumps({'proof': proof})
+        data = json.dumps({'proof': proof, 'miner_id': 'me!'})
         headers = {'content-type': 'application/json'}
-        print(data)
+        # print(data)
         r = requests.post(node + '/mine', data=data, headers=headers)
-        print(f"server responds: {r.status_code} - {r.text}")
         # TODO: If the server responds with 'New Block Forged'
         # add 1 to the number of coins mined and print it.  Otherwise,
-        # print the message from the server.
-        pass
+        if json.loads(r.text)['message'] == "New Block Forged":
+            coins_mined += 1
+        else:
+            # print the message from the server.
+            print(f"server responds: {r.status_code} - {r.text}")
+        print("-"*20)
+        print(f"total mined: {coins_mined}")
+        print("-"*20)

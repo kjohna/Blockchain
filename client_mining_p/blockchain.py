@@ -159,11 +159,28 @@ def mine():
     data = request.get_json()
     print(f"proof: {data['proof']}")
     proof = int(data['proof'])
+    miner_id = data['miner_id']
     # validate the proof
     block_string = json.dumps(blockchain.last_block, sort_keys=True).encode()
     if blockchain.valid_proof(block_string, proof):
         response = {'message': 'good proof!'}
         print("good proof!")
+        # We must give a reward for finding the proof.
+        # The sender is "0" to signify that this node has mine a new coin
+        # The recipient is the miner_id, it did the mining!
+        # The amount is 1 coin as a reward for mining the next block
+        blockchain.new_transaction(0, miner_id, 1)
+        # # Forge the new Block by adding it to the chain
+        last_block_hash = blockchain.hash(blockchain.last_block)
+        block = blockchain.new_block(proof, last_block_hash)
+        # Send a response with the new block
+        response = {
+            'message': "New Block Forged",
+            'index': block['index'],
+            'transactions': block['transactions'],
+            'proof': block['proof'],
+            'previous_hash': block['previous_hash'],
+        }
     else:
         response = {'message': 'bad proof!'}
         print("bad proof!")
