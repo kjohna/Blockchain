@@ -88,8 +88,9 @@ class Blockchain(object):
 
         # SET DIFFICULTY HERE
         # TODO: set to 6 zeros for production
-        difficulty = 3
+        difficulty = 4
         check = "0" * difficulty
+        # print(guess_hash)
         return guess_hash[:difficulty] == check
 
     def valid_chain(self, chain):
@@ -152,29 +153,41 @@ def check_chain():
     return jsonify(res), 200
 
 
-@app.route('/mine', methods=['GET'])
+@app.route('/mine', methods=['POST'])
 def mine():
+    # receive a proof of work from the client
+    data = request.get_json()
+    print(f"proof: {data['proof']}")
+    proof = int(data['proof'])
+    # validate the proof
+    block_string = json.dumps(blockchain.last_block, sort_keys=True).encode()
+    if blockchain.valid_proof(block_string, proof):
+        response = {'message': 'good proof!'}
+        print("good proof!")
+    else:
+        response = {'message': 'bad proof!'}
+        print("bad proof!")
+
     # We run the proof of work algorithm to get the next proof...
-    print('mining...')
-    proof = blockchain.proof_of_work()
-    # We must receive a reward for finding the proof.
-    # The sender is "0" to signify that this node has mine a new coin
-    # The recipient is the current node, it did the mining!
-    # The amount is 1 coin as a reward for mining the next block
-    blockchain.new_transaction(0, node_identifier, 1)
+    # proof = blockchain.proof_of_work()
+    # # We must receive a reward for finding the proof.
+    # # The sender is "0" to signify that this node has mine a new coin
+    # # The recipient is the current node, it did the mining!
+    # # The amount is 1 coin as a reward for mining the next block
+    # blockchain.new_transaction(0, node_identifier, 1)
 
-    # Forge the new Block by adding it to the chain
-    last_block_hash = blockchain.hash(blockchain.last_block)
-    block = blockchain.new_block(proof, last_block_hash)
+    # # Forge the new Block by adding it to the chain
+    # last_block_hash = blockchain.hash(blockchain.last_block)
+    # block = blockchain.new_block(proof, last_block_hash)
 
-    # Send a response with the new block
-    response = {
-        'message': "New Block Forged",
-        'index': block['index'],
-        'transactions': block['transactions'],
-        'proof': block['proof'],
-        'previous_hash': block['previous_hash'],
-    }
+    # # Send a response with the new block
+    # response = {
+    #     'message': "New Block Forged",
+    #     'index': block['index'],
+    #     'transactions': block['transactions'],
+    #     'proof': block['proof'],
+    #     'previous_hash': block['previous_hash'],
+    # }
     return jsonify(response), 200
 
 

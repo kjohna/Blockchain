@@ -19,6 +19,10 @@ def proof_of_work(block):
     p = 0
     while not valid_proof(block_string, p):
         p += 1
+    print(block_string)
+    guess = f'{block_string}{p}'.encode()
+    guess_hash = hashlib.sha256(guess).hexdigest()
+    print(guess_hash)
 
     return p
 
@@ -33,7 +37,7 @@ def valid_proof(block_string, proof):
 
     # SET DIFFICULTY HERE
     # TODO: set to 6 zeros for production
-    difficulty = 3
+    difficulty = 4
     check = "0" * difficulty
     return guess_hash[:difficulty] == check
 
@@ -55,7 +59,7 @@ if __name__ == '__main__':
         # print(r.status_code)
         # # print(r.json)
         # print(r.text)
-        block = json.loads(r.text)
+        block = json.loads(r.text)["latest_block"]
         found = False
         start_time = time.time()
         while not found:
@@ -65,9 +69,14 @@ if __name__ == '__main__':
         find_time = time.time() - start_time
         running = False
         print(f"proof: {proof} found in {find_time}s")
-        # TODO: When found, POST it to the server {"proof": new_proof}
+        # When found, POST it to the server {"proof": new_proof}
         # TODO: We're going to have to research how to do a POST in Python
         # HINT: Research `requests` and remember we're sending our data as JSON
+        data = json.dumps({'proof': proof})
+        headers = {'content-type': 'application/json'}
+        print(data)
+        r = requests.post(node + '/mine', data=data, headers=headers)
+        print(f"server responds: {r.status_code} - {r.text}")
         # TODO: If the server responds with 'New Block Forged'
         # add 1 to the number of coins mined and print it.  Otherwise,
         # print the message from the server.
