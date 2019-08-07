@@ -135,10 +135,10 @@ node_identifier = str(uuid4()).replace('-', '')
 blockchain = Blockchain()
 
 # return the proof of the last block
-@app.route('/latest_proof', methods=['GET'])
-def latest_proof():
+@app.route('/latest_block', methods=['GET'])
+def latest_block():
     res = {
-        'latest_proof': blockchain.last_block['proof']
+        'latest_block': blockchain.last_block
     }
     return jsonify(res), 200
 
