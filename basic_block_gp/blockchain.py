@@ -111,21 +111,26 @@ class Blockchain(object):
         :return: <bool> True if valid, False if not
         """
 
-        last_block = chain[0]
+        prev_block = chain[0]
         current_index = 1
 
         while current_index < len(chain):
             block = chain[current_index]
-            print(f'{last_block}')
+            print(f'{prev_block}')
             print(f'{block}')
             print("\n-------------------\n")
             # Check that the hash of the block is correct
-            # TODO: Return false if hash isn't correct
-
+            if block['previous_hash'] != self.hash(prev_block):
+                print("block hash bad")
+                return False
             # Check that the Proof of Work is correct
-            # TODO: Return false if proof isn't correct
+            block_string = json.dumps(prev_block, sort_keys=True).encode()
+            proof_correct = self.valid_proof(block_string, block['proof'])
+            if not proof_correct:
+                print("block proof of work bad")
+                return False
 
-            last_block = block
+            prev_block = block
             current_index += 1
 
         return True
@@ -139,6 +144,15 @@ node_identifier = str(uuid4()).replace('-', '')
 
 # Instantiate the Blockchain
 blockchain = Blockchain()
+
+# test valid_chain method
+@app.route('/check_chain', methods=['GET'])
+def check_chain():
+    res = {
+        "valid_chain": blockchain.valid_chain(blockchain.chain)
+    }
+
+    return jsonify(res), 200
 
 
 @app.route('/mine', methods=['GET'])
