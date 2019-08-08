@@ -56,10 +56,7 @@ if __name__ == '__main__':
     while running:
         # Get the last block from the server and look for a new one
         r = requests.get(node + '/latest_block')
-        # print(r.status_code)
-        # # print(r.json)
-        # print(r.text)
-        block = json.loads(r.text)["latest_block"]
+        block = r.json()["latest_block"]
         found = False
         start_time = time.time()
         while not found:
